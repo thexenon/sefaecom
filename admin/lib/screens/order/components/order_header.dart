@@ -48,12 +48,12 @@ class ProfileCard extends StatelessWidget {
       child: Row(
         children: [
           Image.asset(
-            "assets/images/profile_pic.png",
+            "assets/images/logo.png",
             height: 38,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-            child: Text("Angelina Jolie"),
+            child: Text("Sefa Motors"),
           ),
           Icon(Icons.keyboard_arrow_down),
         ],

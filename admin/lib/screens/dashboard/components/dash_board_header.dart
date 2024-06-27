@@ -1,3 +1,4 @@
+import 'package:admin/utility/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../utility/constants.dart';
@@ -19,7 +20,7 @@ class DashBoardHeader extends StatelessWidget {
         Expanded(
             child: SearchField(
           onChange: (val) {
-            //TODO: should complete call filterProducts
+            context.dataProvider.filterProducts(val);
           },
         )),
         ProfileCard()
@@ -49,12 +50,12 @@ class ProfileCard extends StatelessWidget {
       child: Row(
         children: [
           Image.asset(
-            "assets/images/profile_pic.png",
+            "assets/images/logo.png",
             height: 38,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-            child: Text("Angelina Jolie"),
+            child: Text("Sefa Motors"),
           ),
           Icon(Icons.keyboard_arrow_down),
         ],
