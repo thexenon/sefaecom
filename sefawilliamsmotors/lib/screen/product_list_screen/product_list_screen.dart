@@ -24,7 +24,7 @@ class ProductListScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Hello Sina",
+                  "Hello, Welcome.",
                   style: Theme.of(context).textTheme.displayLarge,
                 ),
                 Text(
@@ -47,7 +47,7 @@ class ProductListScreen extends StatelessWidget {
                 Consumer<DataProvider>(
                   builder: (context, dataProvider, child) {
                     return ProductGridView(
-                      items: dataProvider.allProducts,
+                      items: dataProvider.products,
                     );
                   },
                 ),

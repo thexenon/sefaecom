@@ -1,4 +1,4 @@
-const MAIN_URL = 'dereksefa.onrender.com';
+const MAIN_URL = 'https://dereksefa.onrender.com';
 
 const FAVORITE_PRODUCT_BOX = 'FAVORITE_PRODUCT_BOX';
 const USER_INFO_BOX = 'USER_INFO_BOX';

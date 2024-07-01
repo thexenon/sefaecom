@@ -41,7 +41,7 @@ class CouponCodeProvider extends ChangeNotifier {
       Map<String, dynamic> coupon = {
         'couponCode': couponCodeCtrl.text,
         'discountType': selectedDiscountType,
-        'discountAmount': discountAmountCtrl,
+        'discountAmount': discountAmountCtrl.text,
         'minimumPurchaseAmount': minimumPurchaseAmountCtrl.text,
         'endDate': endDateCtrl.text,
         'status': selectedCouponStatus,
@@ -77,7 +77,7 @@ class CouponCodeProvider extends ChangeNotifier {
         Map<String, dynamic> coupon = {
           'couponCode': couponCodeCtrl.text,
           'discountType': selectedDiscountType,
-          'discountAmount': discountAmountCtrl,
+          'discountAmount': discountAmountCtrl.text,
           'minimumPurchaseAmount': minimumPurchaseAmountCtrl.text,
           'endDate': endDateCtrl.text,
           'status': selectedCouponStatus,

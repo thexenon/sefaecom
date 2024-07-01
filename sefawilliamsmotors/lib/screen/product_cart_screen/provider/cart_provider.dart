@@ -1,4 +1,7 @@
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
+import 'package:sefawilliamsmotors/utility/utility_extention.dart';
+
 import '../../../models/coupon.dart';
 import '../../login_screen/provider/user_provider.dart';
 import '../../../services/http_services.dart';
@@ -12,6 +15,7 @@ import '../../../core/data/data_provider.dart';
 import '../../../models/api_response.dart';
 import '../../../utility/constants.dart';
 import '../../../utility/snack_bar_helper.dart';
+import 'package:pay_with_paystack/pay_with_paystack.dart';
 
 class CartProvider extends ChangeNotifier {
   HttpService service = HttpService();
@@ -37,27 +41,147 @@ class CartProvider extends ChangeNotifier {
 
   CartProvider(this._userProvider);
 
-  //TODO: should complete updateCart
 
-  //TODO: should complete getCartSubTotal
+  void updateCart(CartModel cartItem, int quantity) {
+    quantity = cartItem.quantity + quantity;
+    flutterCart.updateQuantity(cartItem.productId, cartItem.variants, quantity);
+    notifyListeners();
+  }
 
-  //TODO: should complete getGrandTotal
+  double getCartSubTotal() {
+    return flutterCart.subtotal;
+  }
 
-  //TODO: should complete getCartItems
+  double getGrandTotal() {
+    return getCartSubTotal() - couponCodeDiscount;
+  }
 
-  //TODO: should complete clearCartItems
+  getCartItems() {
+    myCartItems = flutterCart.cartItemsList;
+    notifyListeners();
+  }
+
+  clearCartItems() {
+    flutterCart.clearCart();
+    notifyListeners();
+  }
+
+  checkCoupon() async {
+    try {
+      if (couponController.text.isEmpty) {
+        SnackBarHelper.showErrorSnackBar('Enter a coupon code');
+        return;
+      }
+      List<String> productIds = myCartItems.map((cartItem) => cartItem.productId).toList();
+      Map<String, dynamic> couponData = {
+        'couponCode': couponController.text,
+        'purchaseAmount': getCartSubTotal(),
+        'productIds': productIds
+      };
+      final response = await service.addItem(endpointUrl: 'couponCodes/check-coupon', itemData: couponData);
+      if (response.isOk) {
+        final ApiResponse<Coupon> apiResponse = ApiResponse<Coupon>.fromJson(response.body, (json) => Coupon.fromJson(json as Map<String, dynamic>));
+        if (apiResponse.success == true) {
+          Coupon? coupon = apiResponse.data;
+          if (coupon != null) {
+            couponApplied = coupon;
+            couponCodeDiscount = getCouponDiscountAmount(coupon);
+          }
+          SnackBarHelper.showSuccessSnackBar(apiResponse.message);
+        } else {
+          SnackBarHelper.showErrorSnackBar('Failed to validate Coupon: ${apiResponse.message}');
+        }
+      } else {
+        SnackBarHelper.showErrorSnackBar('Error ${response.body?['message'] ?? response.statusText}');
+      }
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      SnackBarHelper.showErrorSnackBar('An error occurred: $e');
+      rethrow;
+    }
+  }
+
+  double getCouponDiscountAmount(Coupon coupon) {
+    double discountAmount = 0;
+    String discountType = coupon.discountType ?? 'fixed';
+    if (discountType == 'fixed') {
+      discountAmount = coupon.discountAmount ?? 0;
+      return discountAmount;
+    } else {
+      double discountPercentage = coupon.discountAmount ?? 0;
+      double amountAfterDiscountPercentage = getCartSubTotal() * (discountPercentage/100);
+      return amountAfterDiscountPercentage;
+    }
+  }
 
 
-  //TODO: should complete checkCoupon
+  submitOrder(BuildContext context) async {
+    if (selectedPaymentOption == 'cash on delivery') {
+      addOrder(context);
+    } else {
+      // await stripePayment(operation: (){
+      //   addOrder(context);
+      // });
+      await payStackPayment(context);
+    }
+  }
 
-  //TODO: should complete getCouponDiscountAmount
+  addOrder(BuildContext context) async {
+    try {
+      Map<String, dynamic> order = {
+        'userID': _userProvider.getLoginUsr()?.sId ?? '',
+        'orderStatus': 'pending',
+        'items': cartItemToOrderItem(myCartItems),
+        'totalPrice': getCartSubTotal(),
+        'shippingAddress': {
+          'phone': phoneController.text,
+          'street': streetController.text,
+          'city': cityController.text,
+          'state': stateController.text,
+          'postalCode': postalCodeController.text,
+          'country': countryController.text
+        },
+        'paymentMethod': selectedPaymentOption,
+        'couponCode': couponApplied?.sId,
+        'orderTotal': {
+          'subtotal': getCartSubTotal(),
+          'discount': couponCodeDiscount,
+          'total': getGrandTotal(),
+        },
+      };
+      final response = await service.addItem(endpointUrl: 'orders', itemData: order);
+      if (response.isOk){
+        ApiResponse apiResponse = ApiResponse.fromJson(response.body, null);
+        if (apiResponse.success == true){
+          SnackBarHelper.showSuccessSnackBar(apiResponse.message);
+          clearCouponDiscount();
+          clearCartItems();
+          Navigator.pop(context);
+        } else {
+          SnackBarHelper.showErrorSnackBar('Failed to place order ${apiResponse.message}');
+        }
+      } else {
+        SnackBarHelper.showErrorSnackBar('Error ${response.body?['message'] ?? response.statusText}');
+      }
+    } catch (e) {
+      print(e);
+      SnackBarHelper.showErrorSnackBar('An error occurred: $e');
+      rethrow;
+    }
+  }
 
-
-  //TODO: should complete submitOrder
-
-  //TODO: should complete addOrder
-
-  //TODO: should complete cartItemToOrderItem
+  List<Map<String, dynamic>> cartItemToOrderItem(List<CartModel> cartItems) {
+    return cartItems.map((cartItem) {
+      return {
+        'productID': cartItem.productId,
+        'productName': cartItem.productName,
+        'quantity': cartItem.quantity,
+        'price': cartItem.variants.safeElementAt(0)?.price ?? 0,
+        'variant': cartItem.variants.safeElementAt(0)?.color ?? '',
+      };
+    }).toList();
+  }
 
 
   clearCouponDiscount() {
@@ -88,7 +212,7 @@ class CartProvider extends ChangeNotifier {
           "postal_code": postalCodeController.text,
           "country": "US"
         },
-        "amount":  100, //TODO: should complete amount grand total
+        "amount":  getGrandTotal(), //TODO: should complete amount grand total
         "currency": "usd",
         "description": "Your transaction description here"
       };
@@ -166,7 +290,7 @@ class CartProvider extends ChangeNotifier {
       if (razorpayKey != null && razorpayKey != '') {
         var options = {
           'key': razorpayKey,
-          'amount': 100, //TODO: should complete amount grand total
+          'amount': getGrandTotal(), //TODO: should complete amount grand total
           'name': "user",
           "currency": 'INR',
           'description': 'Your transaction description',
@@ -190,6 +314,31 @@ class CartProvider extends ChangeNotifier {
       return;
     }
   }
+  
+  Future<void> payStackPayment(BuildContext context) async {
+    try {
+      await PayWithPayStack().now(
+          context: context,
+          secretKey: "sk_test_13c7139a50ee09adb87e70759084bc7cf55e7c76",
+          customerEmail: "popekabu@gmail.com",
+          reference:
+          DateTime.now().microsecondsSinceEpoch.toString(),
+          callbackUrl: "setup in your paystack dashboard",
+          currency: "GHS",
+          paymentChannel:["mobile_money", "card"],
+          amount: getGrandTotal().toString(),
+          transactionCompleted: () {
+            print("Transaction Successful");
+          },
+          transactionNotCompleted: () {
+            print("Transaction Not Successful!");
+          });
+    } catch (e) {
+      SnackBarHelper.showErrorSnackBar('Error$e');
+      return;
+    }
+  }
+  
 
   void updateUI() {
     notifyListeners();

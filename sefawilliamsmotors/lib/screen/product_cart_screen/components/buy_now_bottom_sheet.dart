@@ -122,7 +122,7 @@ void showCustomBottomSheet(BuildContext context) {
                     return CustomDropdown<String>(
                         bgColor: Colors.white,
                         hintText: cartProvider.selectedPaymentOption,
-                        items: const ['cod', 'prepaid'],
+                        items: const ['cash on delivery', 'prepaid'],
                         onChanged: (val) {
                           cartProvider.selectedPaymentOption = val ?? 'prepaid';
                           cartProvider.updateUI();
@@ -142,7 +142,7 @@ void showCustomBottomSheet(BuildContext context) {
                       ),
                     ),
                     ApplyCouponButton(onPressed: () {
-                      //TODO: should complete call checkCoupon
+                      context.cartProvider.checkCoupon();
                     })
                   ],
                 ),
@@ -160,12 +160,12 @@ void showCustomBottomSheet(BuildContext context) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Total Amount             : \$${100}', //TODO: should complete to CartSubTotal
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                          Text('Total Offer Applied  : \$${cartProvider.couponCodeDiscount}',
+                          Text('Total Amount             : GHs ${context.cartProvider.getCartSubTotal()}',
                               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                          const Text('Grand Total            : \$${100}', //TODO: should complete to GrandTotal
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
+                          Text('Total Offer Applied  : GHs ${cartProvider.couponCodeDiscount}',
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                           Text('Grand Total            : GHs ${context.cartProvider.getGrandTotal()}',
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
                         ],
                       );
                     },
@@ -176,7 +176,7 @@ void showCustomBottomSheet(BuildContext context) {
                 Consumer<CartProvider>(
                   builder: (context, cartProvider, child) {
                     return CompleteOrderButton(
-                        labelText: 'Complete Order  \$${100} ', //TODO: should complete to GrandTotal
+                        labelText: 'Complete Order  GHs ${context.cartProvider.getGrandTotal()} ',
                         onPressed: () {
                           if (!cartProvider.isExpanded) {
                             cartProvider.isExpanded = true;
@@ -186,7 +186,7 @@ void showCustomBottomSheet(BuildContext context) {
                           // Check if the form is valid
                           if (context.cartProvider.buyNowFormKey.currentState!.validate()) {
                             context.cartProvider.buyNowFormKey.currentState!.save();
-                            //TODO: should complete call submitOrder
+                            context.cartProvider.submitOrder(context);
                             return;
                           }
                         });

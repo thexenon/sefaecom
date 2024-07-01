@@ -50,43 +50,201 @@ class DataProvider extends ChangeNotifier {
 
 
   DataProvider() {
-
-    //TODO: should call the method here to load data initially
+    getAllPoster();
+    getAllProducts();
+    getAllCategory();
+    getAllSubCategory();
+    getAllBrands();
 
   }
 
-  //TODO: should complete getAllCategory
 
 
-  //TODO: should complete filterCategories
+  Future<List<Category>> getAllCategory({bool showSnack = false}) async {
+    try {
+      Response response = await service.getItems(endpointUrl: 'categories');
+      if (response.isOk) {
+        ApiResponse<List<Category>> apiResponse = ApiResponse<List<Category>>.fromJson(
+          response.body,
+              (json) => (json as List).map((item) => Category.fromJson(item)).toList(),
+        );
+        _allCategories = apiResponse.data ?? [];
+        _filteredCategories = List.from(_allCategories);
+        notifyListeners();
+        if (showSnack) SnackBarHelper.showSuccessSnackBar(apiResponse.message);
+      }
+    } catch (e) {
+      if (showSnack) SnackBarHelper.showErrorSnackBar(e.toString());
+      rethrow;
+    }
+    return _filteredCategories;
+  }
+
+  void filterCategories(String keyword) {
+    if (keyword.isEmpty) {
+      _filteredCategories = List.from(_allCategories);
+    } else {
+      final lowerKeyword = keyword.toLowerCase();
+      _filteredCategories = _allCategories.where((category) {
+        return (category.name ?? '').toLowerCase().contains(lowerKeyword);
+      }).toList();
+    }
+    notifyListeners();
+  }
+
+  Future<List<SubCategory>> getAllSubCategory({bool showSnack = false}) async {
+    try {
+      Response response = await service.getItems(endpointUrl: 'subCategories');
+      if (response.isOk) {
+        ApiResponse<List<SubCategory>> apiResponse = ApiResponse<List<SubCategory>>.fromJson(
+          response.body,
+              (json) => (json as List).map((item) => SubCategory.fromJson(item)).toList(),
+        );
+        _allSubCategories = apiResponse.data ?? [];
+        _filteredSubCategories = List.from(_allSubCategories);
+        notifyListeners();
+        if (showSnack) SnackBarHelper.showSuccessSnackBar(apiResponse.message);
+      }
+    } catch (e) {
+      if (showSnack) SnackBarHelper.showErrorSnackBar(e.toString());
+      rethrow;
+    }
+    return _filteredSubCategories;
+  }
+
+  void filterSubCategories(String keyword) {
+    if (keyword.isEmpty) {
+      _filteredSubCategories = List.from(_allSubCategories);
+    } else {
+      final lowerKeyword = keyword.toLowerCase();
+      _filteredSubCategories = _allSubCategories.where((subcategory) {
+        return (subcategory.name ?? '').toLowerCase().contains(lowerKeyword);
+      }).toList();
+    }
+    notifyListeners();
+  }
+
+  Future<List<Brand>> getAllBrands({bool showSnack = false}) async {
+    try {
+      Response response = await service.getItems(endpointUrl: 'brands');
+      if (response.isOk) {
+        ApiResponse<List<Brand>> apiResponse = ApiResponse<List<Brand>>.fromJson(
+          response.body,
+              (json) => (json as List).map((item) => Brand.fromJson(item)).toList(),
+        );
+        _allBrands = apiResponse.data ?? [];
+        _filteredBrands = List.from(_allBrands);
+        notifyListeners();
+        if (showSnack) SnackBarHelper.showSuccessSnackBar(apiResponse.message);
+      }
+    } catch (e) {
+      if (showSnack) SnackBarHelper.showErrorSnackBar(e.toString());
+      rethrow;
+    }
+    return _filteredBrands;
+  }
+
+  void filterBrands(String keyword) {
+    if (keyword.isEmpty) {
+      _filteredBrands = List.from(_allBrands);
+    } else {
+      final lowerKeyword = keyword.toLowerCase();
+      _filteredBrands = _allBrands.where((brand) {
+        return (brand.name ?? '').toLowerCase().contains(lowerKeyword);
+      }).toList();
+    }
+    notifyListeners();
+  }
+
+  Future<List<Product>> getAllProducts({bool showSnack = false}) async {
+    try {
+      Response response = await service.getItems(endpointUrl: 'products');
+      if (response.isOk) {
+        ApiResponse<List<Product>> apiResponse = ApiResponse<List<Product>>.fromJson(
+          response.body,
+              (json) => (json as List).map((item) => Product.fromJson(item)).toList(),
+        );
+        _allProducts = apiResponse.data ?? [];
+        _filteredProducts = List.from(_allProducts);
+        notifyListeners();
+        if (showSnack) SnackBarHelper.showSuccessSnackBar(apiResponse.message);
+      }
+    } catch (e) {
+      if (showSnack) SnackBarHelper.showErrorSnackBar(e.toString());
+      rethrow;
+    }
+    return _filteredProducts;
+  }
+
+  void filterProducts(String keyword) {
+    if (keyword.isEmpty) {
+      _filteredProducts = List.from(_allProducts);
+    } else {
+      final lowerKeyword = keyword.toLowerCase();
+      _filteredProducts = _allProducts.where((product) {
+        final productNameContainsKeyword = (product.name ?? '').toLowerCase().contains(lowerKeyword);
+        final categoryNameContainsKeyword = product.proCategoryId?.name?.toLowerCase().contains(lowerKeyword) ?? false;
+        final subCategoryNameContainsKeyword = product.proSubCategoryId?.name?.toLowerCase().contains(lowerKeyword) ?? false;
+        return productNameContainsKeyword || categoryNameContainsKeyword || subCategoryNameContainsKeyword;
+      }).toList();
+    }
+    notifyListeners();
+  }
+
+
+  Future<List<Poster>> getAllPoster({bool showSnack = false}) async {
+    try {
+      Response response = await service.getItems(endpointUrl: 'posters');
+      if (response.isOk) {
+        ApiResponse<List<Poster>> apiResponse = ApiResponse<List<Poster>>.fromJson(
+          response.body,
+              (json) => (json as List).map((item) => Poster.fromJson(item)).toList(),
+        );
+        _allPosters = apiResponse.data ?? [];
+        _filteredPosters = List.from(_allPosters);
+        notifyListeners();
+        if (showSnack) SnackBarHelper.showSuccessSnackBar(apiResponse.message);
+      }
+    } catch (e) {
+      if (showSnack) SnackBarHelper.showErrorSnackBar(e.toString());
+      rethrow;
+    }
+    return _filteredPosters;
+  }
+
+  void filterPosters(String keyword) {
+    if (keyword.isEmpty) {
+      _filteredPosters = List.from(_allPosters);
+    } else {
+      final lowerKeyword = keyword.toLowerCase();
+      _filteredPosters = _allPosters.where((poster) {
+        return (poster.posterName ?? '').toLowerCase().contains(lowerKeyword);
+      }).toList();
+    }
+    notifyListeners();
+  }
 
 
 
-  //TODO: should complete getAllSubCategory
-
-
-  //TODO: should complete filterSubCategories
-
-
-  //TODO: should complete getAllBrands
-
-
-  //TODO: should complete filterBrands
-
-
-
-  //TODO: should complete getAllProduct
-
-
-  //TODO: should complete filterProducts
-
-
-
-
-  //TODO: should complete getAllPosters
-
-
-  //TODO: should complete getAllOrderByUser
+  Future<List<Order>> getAllOrder({bool showSnack = false}) async {
+    try {
+      Response response = await service.getItems(endpointUrl: 'orders');
+      if (response.isOk) {
+        ApiResponse<List<Order>> apiResponse = ApiResponse<List<Order>>.fromJson(
+          response.body,
+              (json) => (json as List).map((item) => Order.fromJson(item)).toList(),
+        );
+        _allOrders = apiResponse.data ?? [];
+        _filteredOrders = List.from(_allOrders);
+        notifyListeners();
+        if (showSnack) SnackBarHelper.showSuccessSnackBar(apiResponse.message);
+      }
+    } catch (e) {
+      if (showSnack) SnackBarHelper.showErrorSnackBar(e.toString());
+      rethrow;
+    }
+    return _filteredOrders;
+  }
 
 
   double calculateDiscountPercentage(num originalPrice, num? discountedPrice) {

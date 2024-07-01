@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_color.dart';
 
 class AppTheme {
   const AppTheme._();
@@ -7,14 +8,14 @@ class AppTheme {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.all(12),
-        backgroundColor: const Color(0xFFf16b26),
+        backgroundColor: const Color(0xff067af6),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(foregroundColor: Colors.deepOrange),
+      style: TextButton.styleFrom(foregroundColor: AppColor.darkGreen),
     ),
     iconTheme: const IconThemeData(color: Color(0xFFA6A3A0)),
     textTheme: const TextTheme(

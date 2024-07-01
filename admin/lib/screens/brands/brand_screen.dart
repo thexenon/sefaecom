@@ -30,7 +30,7 @@ class BrandScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              "My Categories",
+                              "My Brands",
                               style: Theme
                                   .of(context)
                                   .textTheme

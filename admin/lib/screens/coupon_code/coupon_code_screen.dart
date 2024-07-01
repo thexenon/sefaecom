@@ -32,7 +32,7 @@ class CouponCodeScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              "My Sub Categories",
+                              "My Coupon Codes",
                               style: Theme
                                   .of(context)
                                   .textTheme

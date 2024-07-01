@@ -34,22 +34,22 @@ class AppData {
     const BottomNavyBarItem(
       "Home",
       Icon(Icons.home),
-      Color(0xFFEC6813),
+      Color(0xFF067AF6),
     ),
     const BottomNavyBarItem(
       "Favorite",
       Icon(Icons.favorite),
-      Color(0xFFEC6813),
+      Color(0xFFFC0320),
     ),
     const BottomNavyBarItem(
       "Cart",
       Icon(Icons.shopping_cart),
-      Color(0xFFEC6813),
+      Color(0xFF41FC03),
     ),
     const BottomNavyBarItem(
       "Profile",
       Icon(Icons.person),
-      Color(0xFFEC6813),
+      Color(0xFF5BEC13),
     ),
   ];
 

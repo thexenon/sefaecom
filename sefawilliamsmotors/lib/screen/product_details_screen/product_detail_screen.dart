@@ -1,3 +1,5 @@
+import 'package:sefawilliamsmotors/utility/extensions.dart';
+
 import 'provider/product_detail_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -122,7 +124,7 @@ class ProductDetailScreen extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: product.quantity != 0
                               ? () {
-                                  //TODO: should complete call addToCart
+                                  context.proDetailProvider.addToCart(product);
                                 }
                               : null,
                           child: const Text("Add to cart", style: TextStyle(color: Colors.white)),
